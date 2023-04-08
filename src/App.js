@@ -1,90 +1,99 @@
-
-import './App.css';
-import React,{useCallback, useEffect, useState} from 'react';
-import MovieList from './components/MovieList';
-import AddMovie from './components/AddMovie'
+import "./App.css";
+import React, { useCallback, useEffect, useState } from "react";
+import MovieList from "./components/MovieList";
+import AddMovie from "./components/AddMovie";
+const DB_URL =
+  "https://ekart-website-a0b79-default-rtdb.firebaseio.com/movies.json";
 function App() {
-  const[movies,setMovies]=useState([]);
-  const[isLoading,setIsLoading]=useState(false);
-  const[error,setError]=useState(null);
+  const [movies, setMovies] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
- 
-   const  movieHandler=useCallback(async()=>{
+  const movieHandler = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
+    try {
+      const response = await fetch(DB_URL);
 
-    try{
-      const response=await fetch("https://e-commerse-website-eb03a-default-rtdb.firebaseio.com/movies.json");
-     
-      if(!response.ok)
-      {
-        throw new Error("'Something went wrong ....Retrying'")
+      if (!response.ok) {
+        throw new Error("Something went wrong ....Retrying");
       }
-      const data=await response.json();
+      const data = await response.json();
 
-      const loadMovies=data.results.map((film)=>{
-        return{
-          id:film.episode_id,
-          title:film.title,
-          openingText:film.opening_crawl,
-          releaseDate:film.release_date
-        }
-      })
+      const loadMovies = [];
+      for (const key in data) {
+        loadMovies.push({
+          id: key,
+          title: data[key].title,
+          openingText: data[key].openingText,
+          releaseDate: data[key].releaseDate,
+        });
+      }
+
       setMovies(loadMovies);
-      
-    }catch(error)
-    {setError(error.message)}
+    } catch (error) {
+      setError(error.message);
+    }
     setIsLoading(false);
-  },[]);
-  useEffect(()=>{
+  }, []);
+
+  useEffect(() => {
     movieHandler();
-  },[movieHandler]);
+  }, [movieHandler]);
 
-  async function AddMovieHandler(movie){
- const response=await fetch('https://e-commerse-website-eb03a-default-rtdb.firebaseio.com/movies.json',{
-  method:'POST',
-  body : JSON.stringify(movie),
-  headers:{
-  'Content-Type':'application/json'
+  async function AddMovieHandler(movie) {
+    const response = await fetch(
+      DB_URL,
+
+      {
+        method: "POST",
+        body: JSON.stringify(movie),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = await response.json();
+    console.log(data);
   }
- })
- const data=await response.json();
- console.log(data);
-  }
 
-  let content=<p>found no movies</p>
+  const deleteMovieHandler = async (id) => {
+    const response = await fetch(`DB_URL ${id}`, {
+      method: "DELETE",
+      body: JSON.stringify(id),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    movieHandler();
+    const data = await response.json();
+    console.log(data);
+  };
 
-  if(movies.length>0)
-  {
-    content=<p><MovieList movies={movies}></MovieList></p>
+  let content = <p>found no movies</p>;
+
+  if (movies.length > 0) {
+    content = <MovieList  movies={movies} onDeleteMovie={deleteMovieHandler} ></MovieList>;
     console.log(movies);
   }
-  if(error)
-  {
-    content=<p>{error}</p>
+  if (error) {
+    content = <p>{error}</p>;
   }
-  if(isLoading)
-  {
-    content=<p>Loading..........</p>
+  if (isLoading) {
+    content = <p>Loading..........</p>;
   }
 
   return (
-    <React.Fragment>
-      <div className="App">
+   <div>
       <section>
-        <AddMovie onAddMovie={AddMovieHandler}>
-
-        </AddMovie>
+        <AddMovie onAddMovie={AddMovieHandler}></AddMovie>
       </section>
-      <div>
-      
+      <section>
         <button onClick={movieHandler}>Fetch Movies</button>
-      
+      </section>
+      <section>{content}</section>
       </div>
-      {content}
-    </div>
-    </React.Fragment>
   );
 }
 
