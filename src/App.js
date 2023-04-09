@@ -1,52 +1,26 @@
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import ContactUs from './components/ContactUs';
-import About from './components/About';
-import ProductList from "./components/ProductList";
+import { Switch, Route } from 'react-router-dom';
+
+import Layout from './components/Layout/Layout';
+import UserProfile from './components/Profile/UserProfile';
+import AuthPage from './pages/AuthPage';
+import HomePage from './pages/HomePage';
+
 function App() {
   return (
-    <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-            <li>
-              <Link to="/contact">Contact Us</Link>
-            </li>
-          </ul>
-        </nav>
-
-        <nav>
-          <ul>
-            <li>
-              <Link to="/contact">Contact Us</Link>
-            </li>
-          </ul>
-        </nav>
-
-        <Switch>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/contact">
-            <ContactUs />
-          </Route>
-          <Route path="/">
-            <Home />
-          </Route>
-          <Route path="productlist" element={<ProductList />} />
-        </Switch>
-      </div>
-    </Router>
+    <Layout>
+      <Switch>
+        <Route path='/' exact>
+          <HomePage />
+        </Route>
+        <Route path='/auth'>
+          <AuthPage />
+        </Route>
+        <Route path='/profile'>
+          <UserProfile />
+        </Route>
+      </Switch>
+    </Layout>
   );
-}
-
-function Home() {
-  return <h2>Home</h2>;
 }
 
 export default App;
