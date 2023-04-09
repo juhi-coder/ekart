@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import ContactUs from './components/ContactUs';
 import About from './components/About';
-
+import ProductList from "./components/ProductList";
 function App() {
   return (
     <Router>
@@ -38,6 +38,7 @@ function App() {
           <Route path="/">
             <Home />
           </Route>
+          <Route path="productlist" element={<ProductList />} />
         </Switch>
       </div>
     </Router>
